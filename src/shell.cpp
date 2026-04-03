@@ -86,7 +86,7 @@ bool Shell::run_builtin(const std::vector<std::string>& tokens)
   std::string cmd = tokens.at(0);
   if(cmd == "history") {
     for(int i = 0; i < this->cmd_history.size(); i++) {
-      std::cout << i << ": " << this->cmd_history.at(i);
+      std::cout << i << ": " << this->cmd_history.at(i) << std::endl;
     }
   } else 
     return false;
