@@ -1,8 +1,10 @@
+#include <deque>
 #include <iostream>
 #include <string>
 #include <sstream>
 #include <vector>
 
+#include <errno.h>
 #include <unistd.h>
 #include <sys/wait.h>
 
@@ -20,6 +22,7 @@ int main() {
 // Step 2: Store user input & Parse Data
 // Step 3: Run the commands
 void query_command() {
+  std::deque<std::string> cmd_hist;
   while(true) {
     std::string prompt;
     std::cout << "$ " << std::flush;
@@ -34,6 +37,11 @@ void query_command() {
       continue;
     
     exec_command(tokens);
+    cmd_hist.push_back(prompt);
+    
+    // store the most recent 20 commands
+    if(cmd_hist.size() >= 20)
+      cmd_hist.pop_front();
   }
 }
 
@@ -71,15 +79,31 @@ int exec_command(const std::vector<std::string>& v) {
     // execute & exit
     execvp(args[0], args.data());
     perror("execvp");
-    _exit(1);
+    _exit(127);
 
-  } else if(pid > 0) { // case parent
-    // wait for child 
-    int status = 0;
-    if(waitpid(pid, &status, 0) == -1)
-      perror("waitpid");
-  } else // case fork error
+  } 
+
+  if(pid < 0) { // case fork failure
     perror("fork");
-  
+    return 1;
+  }
+
+  // wait for child 
+  int status = 0;
+  while(waitpid(pid, &status, 0) == -1) {
+    if(errno == EINTR)
+      continue;
+    perror("waitpid");
+    return 1;
+  }
+
+  if(WIFEXITED(status))
+    return WEXITSTATUS(status);
+
+  if(WIFSIGNALED(status)) {
+    int sig = WTERMSIG(status);
+    return 128 + sig;
+  }
+
   return 0;
 }
