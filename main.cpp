@@ -4,15 +4,19 @@
 #include <sstream>
 #include <vector>
 
-#include <errno.h>
+#include <errno>
 #include <unistd.h>
 #include <sys/wait.h>
 
 void query_command();
 std::vector<std::string> parse_command(const std::string& str);
 int exec_command(const std::vector<std::string>& v);
+bool run_builtin_command(const std::vector<std::string>& tokens,
+                         const std::deque<std::string>& history,
+                         int& last_status);
 
-int main() {
+int main() 
+{
   query_command();
   return 0;
 }
@@ -21,8 +25,10 @@ int main() {
 // Step 1: Wait for user input
 // Step 2: Store user input & Parse Data
 // Step 3: Run the commands
-void query_command() {
+void query_command() 
+{
   std::deque<std::string> cmd_hist;
+  int last_status = 0;
   while(true) {
     std::string prompt;
     std::cout << "$ " << std::flush;
@@ -36,11 +42,11 @@ void query_command() {
     if(tokens.empty())
       continue;
     
-    exec_command(tokens);
+    last_status = exec_command(tokens);
     cmd_hist.push_back(prompt);
     
     // store the most recent 20 commands
-    if(cmd_hist.size() >= 20)
+    if(cmd_hist.size() > 20)
       cmd_hist.pop_front();
   }
 }
@@ -57,7 +63,8 @@ std::vector<std::string> parse_command(const std::string& str) {
   return tokens;
 }
 
-int exec_command(const std::vector<std::string>& v) {
+int exec_command(const std::vector<std::string>& v) 
+{
   if(v.empty()) 
     return 0;
   // setup child process
@@ -106,4 +113,11 @@ int exec_command(const std::vector<std::string>& v) {
   }
 
   return 0;
+}
+
+bool run_builtin_command(const std::vector<std::string>& tokens,
+                         const std::deque<std::string>& history,
+                         int& last_status) 
+{
+  return true;
 }
