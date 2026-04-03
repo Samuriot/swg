@@ -4,7 +4,7 @@
 #include <sstream>
 #include <vector>
 
-#include <errno>
+#include <errno.h>
 #include <unistd.h>
 #include <sys/wait.h>
 
@@ -41,7 +41,8 @@ void query_command()
     std::vector<std::string> tokens = parse_command(prompt);
     if(tokens.empty())
       continue;
-    
+    if(run_builtin_command(tokens, cmd_hist, last_status))
+      continue;
     last_status = exec_command(tokens);
     cmd_hist.push_back(prompt);
     
@@ -119,5 +120,15 @@ bool run_builtin_command(const std::vector<std::string>& tokens,
                          const std::deque<std::string>& history,
                          int& last_status) 
 {
+  std::string cmd = tokens.at(0);
+  switch(cmd) {
+    case "history":
+      for(int i = 0; i < history.size(); i++) {
+        std::cout << i << ": " << history.at(i);
+      }
+      break;
+    default:
+      return false;
+  }
   return true;
 }
