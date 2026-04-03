@@ -3,7 +3,7 @@ CXXFLAGS = $(shell sdl2-config --cflags) -I include -Wall -std=c++17
 LDFLAGS = $(shell sdl2-config --libs) -framework Cocoa
 
 TARGET = build/shell
-SRCS = src/main.cpp 
+SRCS = src/main.cpp src/shell.cpp
 OBJS = $(SRCS:src/%.cpp=build/%.o)
 
 $(TARGET): $(OBJS)

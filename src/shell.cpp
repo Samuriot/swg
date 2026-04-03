@@ -31,7 +31,7 @@ std::vector<std::string> Shell::parse_command(const std::string& str)
   return tokens;
 }
 
-int Shell::exec_command(){
+int Shell::exec_command(const std::vector<std::string>& v)
 {
   if(v.empty()) 
     return 0;
@@ -84,15 +84,12 @@ int Shell::exec_command(){
 bool Shell::run_builtin(const std::vector<std::string>& tokens) 
 {
   std::string cmd = tokens.at(0);
-  switch(cmd) {
-    case "history":
-      for(int i = 0; i < history.size(); i++) {
-        std::cout << i << ": " << history.at(i);
-      }
-      break;
-    default:
-      return false;
-  }
+  if(cmd == "history") {
+    for(int i = 0; i < this->cmd_history.size(); i++) {
+      std::cout << i << ": " << this->cmd_history.at(i);
+    }
+  } else 
+    return false;
   return true;
 }
 
@@ -110,13 +107,13 @@ void Shell::run()
     std::vector<std::string> tokens = this->parse_command(prompt);
     if(tokens.empty())
       continue;
-    if(run_builtin(tokens);
+    if(run_builtin(tokens))
       continue;
     this->last_status = this->exec_command(tokens);
     this->cmd_history.push_back(prompt);
     
     // store the most recent 20 commands
     if(this->cmd_history.size() > 20)
-      this->cmd_hist.pop_front();
+      this->cmd_history.pop_front();
   }
 }
