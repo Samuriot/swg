@@ -8,11 +8,13 @@
 
 class Shell {
   private:
-    void query_command();
+    std::deque<std::string> cmd_history;
+    int last_status;
+
+    // helper methods
     int exec_command();
-    bool run_builtin(const std::vector<std::string>& tokens,
-                     const std::deque<std::string>& history,
-                     int& last_status);
+    bool run_builtin(const std::vector<std::string>& tokens);
+    std::vector<std::string> parse_command(const std::string& cmd);
   public:
     Shell();
     ~Shell();
