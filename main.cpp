@@ -4,7 +4,8 @@
 #include <vector>
 
 void query_command();
-std::vector<std::string> parse_command(std::string& str);
+std::vector<std::string> parse_command(const std::string& str);
+int exec_command();
 
 int main(int argc, char** argv) {
   query_command();
@@ -16,23 +17,18 @@ int main(int argc, char** argv) {
 // Step 2: Store user input & Parse Data
 // Step 3: Run the commands
 void query_command() {
-  while(1) {
+  while(true) {
     std::string prompt;
-    std::vector<std::string> tokens;
     std::cout << "$ " << std::flush;
-    std::getline(std::cin, prompt);
-    if(prompt == "") {
+    if(!std::getline(std::cin, prompt))
+      break;
+    if(prompt == "") 
       continue;
-    }
-    tokens = parse_command(prompt);
-    for(auto& token: tokens) {
-      std::cout << token << " ";
-    }
-    std::cout << std::endl;
+    std::vector<std::string> tokens = parse_command(prompt);
   }
 }
 
-std::vector<std::string> parse_command(std::string& str) {
+std::vector<std::string> parse_command(const std::string& str) {
   std::istringstream parser(str);
   std::string token;
 
@@ -42,4 +38,8 @@ std::vector<std::string> parse_command(std::string& str) {
   } 
 
   return tokens;
+}
+
+int exec_command() {
+  return 0;
 }
